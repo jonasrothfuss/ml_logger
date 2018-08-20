@@ -289,22 +289,27 @@ class ML_Logger:
 
         # todo: add logging hook
         # todo: add yml support
-        self.log_data(path=path, data=kwargs)
+        self.log_pkl(path=path, data=kwargs)
 
-    def log_data(self, data, path="data.pkl", overwrite=False):
+    def log_pkl(self, data, path="data.pkl"):
         """
         Append data to the file located at the path specified.
 
         :param data: python data object to be saved
         :param path: path for the object, relative to the root logging directory.
-        :param overwrite: boolean flag to switch between 'appending' mode and 'overwrite' mode.
-        :return: None
         """
         abs_path = os.path.join(self.prefix or "", path)
-        if overwrite:
-            self.logger.log(key=abs_path, data=data, overwrite=overwrite)
-        else:
-            self.logger.log(key=abs_path, data=data)
+        self.logger.log(key=abs_path, data=data, overwrite=False)
+
+    def dump_pkl(self, data, path):
+        """
+        Dump data to the file located at the path specified. If file already exists it will be overwritten.
+
+        :param data: python data object to be saved
+        :param path: path for the object, relative to the root logging directory.
+        """
+        abs_path = os.path.join(self.prefix or "", path)
+        self.logger.log(key=abs_path, data=data, overwrite=True)
 
     def log_keyvalue(self, key: str, value: Any, step: Union[int, Color] = None, silent=False) -> None:
         if self.step != step and step is not None:
@@ -419,17 +424,6 @@ class ML_Logger:
         content = Path(file_path).read_text()
         basename = os.path.basename(file_path)
         self.log_text(content, filename=os.path.join(namespace, basename), silent=silent)
-
-    def log_dir(self, dir_path, namespace='', excludes=tuple(), silent=True):
-        """log a directory"""
-
-    def log_images(self, key, stack, ncol=5, nrows=2, namespace="image", fstring="{:04d}.png"):
-        """note: might makesense to push the operation to the server instead.
-        logs a stack of images from a tensor object. Could also be part of the server code.
-
-        update: client-side makes more sense, less data to send.
-        """
-        pass
 
     def log_image(self, image, key, namespace="images", format="png"):
         """
@@ -557,7 +551,7 @@ class ML_Logger:
             ps = {k: v.cpu().detach().numpy() for k, v in module.state_dict().items()}
             # we use the number first file names to help organize modules by epoch.
             path = os.path.join(namespace, f'{var_name}.pkl' if self.step is None else f'{step:{fmt}}_{var_name}.pkl')
-            self.log_data(path=path, data=ps)
+            self.log_pkl(path=path, data=ps)
 
     def load_file(self, key):
         """ return the binary stream, most versatile.
@@ -567,22 +561,23 @@ class ML_Logger:
         """
         return self.logger.read(os.path.join(self.prefix, key))
 
-    def load_pkl(self, key):
+    def load_pkl_log(self, path):
         """
-        load a pkl file (as a tuple)
+        load a pkl log (as a list of data instances)
 
-        :param key:
-        :return:
+        :param path: relative pickle file path
+        :return: list of data log items
         """
-        return self.logger.read_pkl(os.path.join(self.prefix, key))
+        return self.logger.read_pkl(os.path.join(self.prefix, path))
 
-    def load_np(self, key):
-        """ load a np file
-
-        :param key:
-        :return:
+    def load_pkl(self, path):
         """
-        return self.logger.read_np(os.path.join(self.prefix, key))
+        load a pkl file
+
+        :param path: relative pickle file path
+        :return: data instance loaded from pickle file
+        """
+        return self.logger.read_pkl(os.path.join(self.prefix, path))[0]
 
     @staticmethod
     def plt2data(fig):

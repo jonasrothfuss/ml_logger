@@ -42,16 +42,16 @@ def setup(log_dir):
     print(f"logging to {pathJoin(logger.log_directory, logger.prefix)}")
 
 
-def test_load_pkl(setup):
+def test_load_pkl_log(setup):
     import numpy
     d1 = numpy.random.randn(20, 10)
-    logger.log_data(d1, 'test_file.pkl')
+    logger.log_pkl(d1, 'test_file.pkl')
     sleep(1.0)
     d2 = numpy.random.randn(20, 10)
-    logger.log_data(d2, 'test_file.pkl')
+    logger.log_pkl(d2, 'test_file.pkl')
     sleep(1.0)
 
-    data = logger.load_pkl('test_file.pkl')
+    data = logger.load_pkl_log('test_file.pkl')
     assert len(data) == 2, "data should contain two arrays"
     assert numpy.array_equal(data[0], d1), "first should be the same as d1"
     assert numpy.array_equal(data[1], d2), "first should be the same as d2"
@@ -60,13 +60,13 @@ def test_load_pkl(setup):
 def test_log_data(setup):
     import numpy
     d1 = numpy.random.randn(20, 10)
-    logger.log_data(d1, 'test_file.pkl')
+    logger.log_pkl(d1, 'test_file.pkl')
     sleep(1.0)
     d2 = numpy.random.randn(20, 10)
-    logger.log_data(d2, 'test_file.pkl', overwrite=True)
+    logger.dump_pkl(d2, 'test_file.pkl')
     sleep(1.0)
 
-    data = logger.load_pkl('test_file.pkl')
+    data = logger.load_pkl_log('test_file.pkl')
     assert len(data) == 1, "data should contain only one array because we overwrote it."
     assert numpy.array_equal(data[0], d2), "first should be the same as d2"
 
@@ -168,7 +168,7 @@ def test_module(setup):
 
 
 def test_load_module(setup, test_module):
-    result, = logger.load_pkl(f"modules/{0:04d}_Test.pkl")
+    result, = logger.load_pkl_log(f"modules/{0:04d}_Test.pkl")
     import numpy as np
     assert (result['var_1'] == np.ones([100, 2])).all(), "should be the same as test data"
 
