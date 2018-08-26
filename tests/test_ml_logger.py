@@ -36,10 +36,16 @@ def log_dir(request):
 def setup(log_dir):
     logger.configure(log_dir, prefix='main_test_script')
     logger.remove('')
-    logger.print('hey')
+    logger.log_line('hey')
     sleep(1.0)
 
     print(f"logging to {pathJoin(logger.log_directory, logger.prefix)}")
+
+def test_configuration(log_dir):
+    logger.configure(log_dir, prefix='main_test_script', color='green')
+    logger.log("This is a unittest")
+    logger.log("Some stats", reward=0.05, kl=0.001)
+    logger.flush()
 
 
 def test_load_pkl_log(setup):
