@@ -21,6 +21,6 @@ setup(name="ml_logger",
           "Programming Language :: Python :: 3"
       ],
       packages=["ml_logger"],
-      install_requires=["typing", "numpy", "termcolor", "params_proto", "cloudpickle", "japronto",
+      install_requires=["typing", "numpy", "termcolor", "params_proto", "cloudpickle",
                         'dill', 'ruamel.yaml']
       )
