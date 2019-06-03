@@ -22,5 +22,5 @@ setup(name="ml_logger",
       ],
       packages=["ml_logger"],
       install_requires=["typing", "numpy", "termcolor", "params_proto", "cloudpickle",
-                        'dill', 'ruamel.yaml']
+                        'dill', 'ruamel.yaml', 'requests_futures']
       )
